@@ -1,8 +1,8 @@
 # phillycodefest
 Until Jake gets the GeoLocation, we can use this temp sol. You manually enter the GIS coord in a form.
-  Jake is doing task 1. below. 
-  Amarildo is doing 2.
-  Paddy is doing 3. 
+Jake is doing task 1. below. 
+Amarildo is doing 2.
+Paddy is doing 3. 
 
 
 1. user nav to our site, we collect their loc, and display venues around them they can begin communicating w/
