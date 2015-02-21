@@ -7,26 +7,29 @@ import (
 	"appengine/memcache"
 )
 
-// Rooms are stored in the datastore to be the parent entity of many Clients,
+// Building are stored in the datastore to be the parent entity of many Clients,
 // keeping all the participants in a particular chat in the same entity group.
 
-// Room represents a chat room.
-type Room struct {
+// Building represents a Pysical buidling or place sourrended by a geo lat/long.
+type Building struct {
 	Name string
+	Address string
+	Occupants int
 }
 
-func (r *Room) Key(c appengine.Context) *datastore.Key {
-	return datastore.NewKey(c, "Room", r.Name, 0, nil)
+func (r *Building) Key(c appengine.Context) *datastore.Key {
+	return datastore.NewKey(c, "Building", r.Name, 0, nil)
+	
 }
 
-// Client is a participant in a chat Room.
+// Person is an Occupant in a Building.
 type Client struct {
 	ClientID string // the channel Client ID
 }
 
-// AddClient puts a Client record to the datastore with the Room as its
+// AddClient puts a Client record to the datastore with the Building as its
 // parent, creates a channel and returns the channel token.
-func (r *Room) AddClient(c appengine.Context, id string) (string, error) {
+func (r *Building) AddClient(c appengine.Context, id string) (string, error) {
 	key := datastore.NewKey(c, "Client", id, 0, r.Key(c))
 	client := &Client{id}
 	_, err := datastore.Put(c, key, client)
@@ -36,11 +39,10 @@ func (r *Room) AddClient(c appengine.Context, id string) (string, error) {
 
 	// Purge the now-invalid cache record (if it exists).
 	memcache.Delete(c, r.Name)
-
 	return channel.Create(c, id)
 }
 
-func (r *Room) Send(c appengine.Context, message string) error {
+func (r *Building) Send(c appengine.Context, message string) error {
 	var clients []Client
 
 	_, err := memcache.JSON.Get(c, r.Name, &clients)
@@ -72,18 +74,18 @@ func (r *Room) Send(c appengine.Context, message string) error {
 	return nil
 }
 
-// getRoom fetches a Room by name from the datastore,
+// getBuilding fetches a Building by name from the datastore,
 // creating it if it doesn't exist already.
-func getRoom(c appengine.Context, name string) (*Room, error) {
-	room := &Room{name}
+func getBuilding(c appengine.Context, name string) (*Building, error) {
+	building := &Building{name, "", 0}
 
 	fn := func(c appengine.Context) error {
-		err := datastore.Get(c, room.Key(c), room)
+		err := datastore.Get(c, building.Key(c), building)
 		if err == datastore.ErrNoSuchEntity {
-			_, err = datastore.Put(c, room.Key(c), room)
+			_, err = datastore.Put(c, building.Key(c), building)
 		}
 		return err
 	}
 
-	return room, datastore.RunInTransaction(c, fn, nil)
+	return building, datastore.RunInTransaction(c, fn, nil)
 }
