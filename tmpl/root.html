@@ -1,5 +1,5 @@
 <html>
-<title>{{html .Room}} - cuddle</title>
+<title>{{html .Building}}</title>
 <meta name="viewport" content="width=250, user-scalable=no" />
 <style>
 html {
@@ -24,24 +24,33 @@ body {
 	padding: 4px;
 	color: white;
 }
+#adminlog div {
+	padding: 8px;
+	color: red;
+}
 </style>
 <body>
 
-<div id="heading">{{html .Room}}</div>
+<div id="heading">{{html .Building}}</div>
 <div id="in"><input type="text"></div>
+<div id="adminlog"></div>
 <div id="log"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script src="/_ah/channel/jsapi"></script>
 <script>
 $(function() {
-	var room = '{{js .Room}}';
+	var room = '{{js .Building}}';
 	var token = '{{js .Token}}';
 
 	var chan = new goog.appengine.Channel(token);
 	var sock = chan.open();
 	sock.onmessage = function(msg) {
-		$("#log").prepend($('<div />').text(msg.data));
+		if (msg.data.indexOf("ADMIN") >= 0){
+			$("#adminlog").prepend($('<div />').text(msg.data.substring(6)));
+		} else {
+			$("#log").prepend($('<div />').text(msg.data));
+		}
 	}
 
 	var $in = $('#in input').focus();

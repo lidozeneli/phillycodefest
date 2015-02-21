@@ -3,7 +3,7 @@ package Demo
 import (
 	"appengine"
 	"appengine/user"
-	
+	"fmt"
     "net/http"
     "html/template"
 )
@@ -38,13 +38,15 @@ func root(w http.ResponseWriter, r *http.Request) {
         return
     }
 	
-	// Get or create the Room.
-	room, err := getRoom(c, "PHILLYCITYHALL")
+	//buildingName = getBuildingName(lat, lon)
+	// lat => 39.953534, lon => -75.188456
+	// Get or create the Building.
+	room, err := getBuilding(c, "PHILLYCITYHALL")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
+	fmt.Println("clientid ", u.ID)
 	// Create a new Client, getting the channel token.
 	token, err := room.AddClient(c, u.ID)
 	if err != nil {
@@ -53,7 +55,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render the HTML template.
-	data := struct{ Room, Token string }{room.Name, token}
+	data := struct{ Building, Token string }{room.Name, token}
 	err = rootTmpl.Execute(w, data)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -63,15 +65,22 @@ func root(w http.ResponseWriter, r *http.Request) {
 // post broadcasts a message to a specified Room.
 func post(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
+    u := user.Current(c) // assumes 'login: required' set in app.yaml
+	c.Infof("clientid ", u.ID)
+	message := r.FormValue("msg")
+	
+	if user.IsAdmin(c) {
+		message = "ADMIN:" + message
+	}
 	// Get the room.
-	room, err := getRoom(c, r.FormValue("room"))
+	room, err := getBuilding(c, r.FormValue("room"))
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
+	
 	// Send the message to the clients in the room.
-	err = room.Send(c, r.FormValue("msg"))
+	err = room.Send(c, message)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
