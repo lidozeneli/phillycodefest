@@ -1,4 +1,9 @@
 # phillycodefest
+Until Jake gets the GeoLocation, we can use this temp sol. You manually enter the GIS coord in a form.
+  Jake is doing task 1. below. 
+  Amarildo is doing 2.
+  Paddy is doing 3. 
+
 
 1. user nav to our site, we collect their loc, and display venues around them they can begin communicating w/
 2. once a user clicks on a building, we create a chat room for that building.
@@ -14,3 +19,4 @@ We will be using golang on appengine. Here is the break down of the essential ap
 
 3. The overall routing is through the appengine 'net/http' and 'html/template'
  - for presentation, maybe we can find someone w/ expr using say bootstrap...
+
