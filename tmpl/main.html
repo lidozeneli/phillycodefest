@@ -1,0 +1,73 @@
+<html>
+<title>{{html .Building}}</title>
+<meta name="viewport" content="width=250, user-scalable=no" />
+<style>
+html {
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: none;
+}
+body {
+	font-family: sans-serif;
+	background-color: #104;
+}
+#heading {
+	font-size: 150%;
+	color: #F9C;
+}
+#in {
+	padding: 4px 0;
+}
+#in input {
+	width: 235px;
+}
+#log div {
+	padding: 4px;
+	color: white;
+}
+#adminlog div {
+	padding: 8px;
+	color: red;
+}
+#location div {
+	padding: 8px;
+	color: white;
+}
+</style>
+<body>
+<div id="heading" >{{html .Building}}</div>
+<div id="in" ><input type="text"></div>
+<div id="adminlog"></div>
+<div id="log"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+<script src="/_ah/channel/jsapi"></script>
+<script>
+$(function() {
+	var room = '{{js .Building}}';
+	var token = '{{js .Token}}';
+
+	var chan = new goog.appengine.Channel(token);
+	var sock = chan.open();
+	sock.onmessage = function(msg) {
+		if (msg.data.indexOf("ADMIN") >= 0){
+			$("#adminlog").prepend($('<div />').text(msg.data.substring(6)));
+		} else {
+			$("#log").prepend($('<div />').text(msg.data));
+		}
+	}
+
+	var $in = $('#in input').focus();
+	$in.keypress(function(e) {
+		if (e.which != 13 && e.which != 10) {
+			return;
+		}
+		e.preventDefault();
+		var msg = $in.val();
+		$in.val('');
+		$.ajax('/post', {data: {room: room, msg: msg}});
+	});
+});
+</script>
+</body>
+</html>
