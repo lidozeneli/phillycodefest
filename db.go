@@ -16,12 +16,13 @@ type Building struct {
 	Address string
 	Occupants int
 }
-
+type Vertex struct {
+	lat, lng float64
+}
 func (r *Building) Key(c appengine.Context) *datastore.Key {
 	return datastore.NewKey(c, "Building", r.Name, 0, nil)
 	
 }
-
 // Person is an Occupant in a Building.
 type Client struct {
 	ClientID string // the channel Client ID

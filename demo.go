@@ -26,18 +26,37 @@ var rootTmpl = template.Must(template.ParseFiles("tmpl/root.html"))
 func root(w http.ResponseWriter, r *http.Request) {
 
 	c := appengine.NewContext(r)
-    u := user.Current(c) // assumes 'login: required' set in app.yaml
-    if u == nil {
-        url, err := user.LoginURL(c, r.URL.String())
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-        w.Header().Set("Location", url)
-        w.WriteHeader(http.StatusFound)
-        return
-    }
+	u := user.Current(c) // assumes 'login: required' set in app.yaml
+	var room *Building
+	var err error
+	if u == nil {
+		url, err := user.LoginURL(c, r.URL.String())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Location", url)
+		w.WriteHeader(http.StatusFound)
+		return
+	}
+	curr := Vertex{39.95352,-75.18845}
+	var m = map[string]Vertex{
+		"James Creese Center":     {39.95364,-75.18866},
+		"Behrakis Hall":           {39.95352,-75.18845},
+	}
+	for i, v := range m {
+		if lat := v.lat - curr.lat; lat <=.0002 && lat >= -.0002 {
+			if lng := v.lng - curr.lng; lng <=.0002 && lng >= -.0002 {
+				room, err = getBuilding(c, i)
+				if err != nil {
+					http.Error(w, err.Error(), 500)
+					return
+				}
+			}
+		}
+	}
 	
+	/*
 	//buildingName = getBuildingName(lat, lon)
 	// lat => 39.953534, lon => -75.188456
 	// Get or create the Building.
@@ -45,7 +64,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
-	}
+	}*/
+	
 	fmt.Println("clientid ", u.ID)
 	// Create a new Client, getting the channel token.
 	token, err := room.AddClient(c, u.ID)
