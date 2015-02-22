@@ -72,25 +72,16 @@ func geo(w http.ResponseWriter, r *http.Request) {
 	
 	//read from the locatoin file and build the m map
 	
-	//	curr := Vertex{39.95352,-75.18845}
+//	curr := Vertex{39.95352,-75.18845}
 	var m = map[string]Vertex{
 		"James Creese Center":     {39.95364,-75.18866},
 		"Behrakis Hall":           {39.95352,-75.18845},
-		"University City":         {39.9504406,-75.1924755},
-		"Drexel University Book Store":         {39.953626,-75.189374},
-		"Chestnut Square":         {39.953664,-75.187771},
-		"Laboratory for Research on the Structure of Matter" : {39.952945,-75.189618},
-		"Shake Shack" : {39.953693, -75.188543},
-		"Stratton Hall" : { 39.953593,-75.188394},
-		"Hillel at Drexel University" : { 39.953393,-75.188694},
-		"coZara" : { 39.953741, -75.189365},
-		"Wahoo's" : { 39.953621,-75.187376 },		
 	}
 
 	//var room 
 	for i, v := range m {
-		if lat := v.lat - curr.lat; lat <=.00002 && lat >= -.00002 {
-			if lng := v.lng - curr.lng; lng <=.0002 && lng >= -.0002 {
+		if lat := v.lat - curr.lat; lat <=.2 && lat >= -.2 {
+			if lng := v.lng - curr.lng; lng <=.2 && lng >= -.2 {
 				room, err = getBuilding(c, i)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
