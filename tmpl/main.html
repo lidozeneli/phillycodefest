@@ -34,39 +34,29 @@ body {
 }
 </style>
 <body>
-<div id="heading" >{{html .Building}}</div>
+<div id="heading" >{{html .Building}} <br><i>Current Occupants:{{html .Count}}</i></div>
 
-<div class="form-group">
-	<div id="in" ><input type="text"></div>
-	<div id="adminlog"></div>
-	<div id="log"></div>
-		<input type="text" placeholder="Type message here...">
-		<button type="submit" class="btn btn-default" value="Submit Button">Send</button>
-	</div>
-</div>
-
-<ul class="pager">
-	<li class="previous"><a href="#">Sign Up</a></li>
-  <li class="next"><a href="#">New Location</a></li>
-</ul>
+<div id="in" ><input type="text"></div>
+<div id="adminlog"></div>
+<div id="log"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script src="/_ah/channel/jsapi"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script>
+
+	
 $(function() {
 	var room = '{{js .Building}}';
 	var token = '{{js .Token}}';
+	var count = '{{js .Count}}';
 
 	var chan = new goog.appengine.Channel(token);
 	var sock = chan.open();
 	sock.onmessage = function(msg) {
 		if (msg.data.indexOf("ADMIN") >= 0){
-			$("#adminlog").prepend($('</div>').text(msg.data.substring(6)));
-			$("#adminlog").prepend($('</li><li class="list-group-item"><span class="badge"></span><div />').text(msg.data.substring(6)));
+			$("#adminlog").prepend($('<div />').text(msg.data.substring(6)));
 		} else {
-			$("#log").prepend($('</div>').text(msg.data));
-			$("#log").prepend($('</li><li class="list-group-item"><span class="badge"></span><div />').text(msg.data));
+			$("#log").prepend($('<div />').text(msg.data));
 		}
 	}
 

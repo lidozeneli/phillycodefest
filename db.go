@@ -43,6 +43,39 @@ func (r *Building) AddClient(c appengine.Context, id string) (string, error) {
 	return channel.Create(c, id)
 }
 
+func (r *Building) GetCount(c appengine.Context) (int, error) {
+	var clients []Client
+	count := 0
+	_, err := memcache.JSON.Get(c, r.Name, &clients)
+	if err != nil && err != memcache.ErrCacheMiss {
+		return count, err
+	} 
+	if err == memcache.ErrCacheMiss {
+		q := datastore.NewQuery("Client").Ancestor(r.Key(c))
+		_, err = q.GetAll(c, &clients)
+		if err != nil {
+			return count, err
+		}
+		err = memcache.JSON.Set(c, &memcache.Item{
+			Key: r.Name, Object: clients,
+		})
+		if err != nil {
+			return count, err
+		}
+	}
+	
+	/*		
+		c.Infof("inside else clientid", r.Name)
+		for _, client := range clients {
+			if client.ClientID != ""{
+				c.Infof("clientid", client.ClientID)
+			}
+			count = count + 1 }
+	}
+	*/
+	count = len(clients)
+	return count, nil
+}
 func (r *Building) Send(c appengine.Context, message string) error {
 	var clients []Client
 
