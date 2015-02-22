@@ -1,38 +1,40 @@
 <html>
+  <head>
 <title>{{html .Building}}</title>
 <meta name="viewport" content="width=250, user-scalable=no" />
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
 <style>
 
-body {
-	font-family: sans-serif;
-	background-color: lightgrey;
-}
-#heading {
-	font-size: 150%;
-color: lightblue;
-}
-#in {
-	padding: 4px 0;
-}
-#in input {
-	width: 235px;
-}
-#log div {
-	padding: 4px;
-	color: white;
-}
-#adminlog div {
-	padding: 8px;
-	color: red;
-}
-#location div {
-	padding: 8px;
-	color: white;
-}
+      body {padding-bottom: 70px;}
+      .content {margin:10px;}
+      #in {
+      padding: 4px 0;
+      }
+      #in input {
+      width: 235px;
+      }
+      #log div {
+      padding: 4px;
+      color: black;
+      }
+      #adminlog div {
+      padding: 8px;
+      color: red;
+      }
+      #location div {
+      padding: 8px;
+      color: white;
+      }
 </style>
-<body>
-<div id="heading" >{{html .Building}} <br><i>Current Occupants:{{html .Count}}</i></div>
-
+<h2>{{html .Building}} <br><i>Current Occupants:{{html .Count}}</h2>
+</head>
+<body style="text-align:center">
+   <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+	<a class="navbar-brand">LoomUp</a>
+      </div>
+    </nav>
 <div id="in" ><input type="text"></div>
 <div id="adminlog"></div>
 <div id="log"></div>

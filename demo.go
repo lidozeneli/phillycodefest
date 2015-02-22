@@ -3,11 +3,11 @@ package Loomup
 import (
 	"appengine"
 	//"appengine/user"
-	"fmt"
-    "net/http"
-    "html/template"
-    "strconv"
-    "time"
+	//"fmt"
+	"net/http"
+	"html/template"
+	"strconv"
+	"time"
 
 )
 
@@ -22,8 +22,9 @@ func init() {
 }
 
 // rootTmpl is the main (and only) HTML template.
-var rootTmpl = template.Must(template.ParseFiles("tmpl/root.html"))
-var mainTmpl = template.Must(template.ParseFiles("tmpl/main.html"))
+var rootTmpl = template.Must(template.ParseFiles("root.html"))
+var mainTmpl = template.Must(template.ParseFiles("main.html"))
+var templates = template.Must(template.ParseFiles("header.html", "footer.html", "about.html"))
 
 type resultrec struct{ Building string 
 	Token string
@@ -65,17 +66,23 @@ func geo(w http.ResponseWriter, r *http.Request) {
     }
     */
     //39.9568382&longitude=-75.1812252
-    
+	//lat := r.FormValue("latitude")
+	//lng := r.FormValue("longitude")
+	
+	//	latitude, _ :=	 strconv.ParseFloat(lat[:8], 64)
+	//	longitude, _ :=  strconv.ParseFloat(lng[:9], 64)
+
 	latitude, _ :=	 strconv.ParseFloat(r.FormValue("latitude"), 64)
 	longitude, _ :=  strconv.ParseFloat(r.FormValue("longitude"), 64)
+	
 	curr := Vertex{ latitude,  longitude}
 	
 	//read from the locatoin file and build the m map
 	
 	//	curr := Vertex{39.95352,-75.18845}
 	var m = map[string]Vertex{
-		"James Creese Center":     {39.95364,-75.18866},
-		"Behrakis Hall":           {39.95352,-75.18845},
+		"Behrakis Grand Hall":           {39.95352,-75.18845},
+		"James Creese Student Center":     {39.95364,-75.18866},
 		"University City":         {39.9504406,-75.1924755},
 		"Drexel University Book Store":         {39.953626,-75.189374},
 		"Chestnut Square":         {39.953664,-75.187771},
@@ -89,31 +96,24 @@ func geo(w http.ResponseWriter, r *http.Request) {
 
 	//var room 
 	for i, v := range m {
-		if lat := v.lat - curr.lat; lat <=.00002 && lat >= -.00002 {
+		if lat := v.lat - curr.lat; lat <=.00001 && lat >= -.00001 {
 			if lng := v.lng - curr.lng; lng <=.0002 && lng >= -.0002 {
 				room, err = getBuilding(c, i)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
 					return
 				}
+				break
 			}
 		}
 	}
-	
-	//buildingName = getBuildingName(lat, lon)
-	// lat => 39.953534, lon => -75.188456
-	// Get or create the Building.
-	//room, err = getBuilding(c, "PHILLYCITYHALL")
-	/*
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	*/
 	if room == nil {
 		//to do add
-		fmt.Fprintf(w, "No building in you area." )
-		return	
+		room, err = getBuilding(c, "Behrakis Grand Hall")
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
 	//fmt.Println("clientid ", u.ID)
 	// Create a new Client, getting the channel token.
