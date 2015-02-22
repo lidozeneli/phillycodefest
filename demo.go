@@ -1,4 +1,4 @@
-package Demo
+package Loomup
 
 import (
 	"appengine"
