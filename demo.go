@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"strconv"
 	"time"
+	
 
 )
 
@@ -50,11 +51,7 @@ func geo(w http.ResponseWriter, r *http.Request) {
 	var room *Building
 	var err error
 	c := appengine.NewContext(r)
-	admin := r.FormValue("admin")
-	if admin != ""{
-		cookie := &http.Cookie{Name:"admin", Value:admin, Expires:time.Now().Add(356*24*time.Hour), HttpOnly:true}
-		http.SetCookie(w, cookie)		
-	}
+	
 	/*
     u := user.Current(c) // assumes 'login: required' set in app.yaml
     
@@ -128,7 +125,7 @@ func geo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	count, cerr := room.GetCount(c)
-	//c.Infof("count", count)
+	c.Infof("count", count)
 	if cerr == nil{
 		c.Infof("cerr", cerr)
 	}
@@ -145,19 +142,12 @@ func geo(w http.ResponseWriter, r *http.Request) {
 
 // post broadcasts a message to a specified Room.
 func post(w http.ResponseWriter, r *http.Request) {
-	const layout = "3:04pm (EST)"
+	const layout = "3:04pm (MST)"
 	posttime := time.Now().Format(layout)
 	c := appengine.NewContext(r)
     //u := user.Current(c) // assumes 'login: required' set in app.yaml
 	//c.Infof("clientid ", u.ID)
 	message := r.FormValue("msg") + "   " + posttime
-	cookie, _ := r.Cookie("admin")
-	if cookie != nil  {
-		if cookie.Value == "true" {
-			c.Infof("cookie", cookie.Value)
-			message = "ADMIN:" + message
-			}
-	}
 	/*
 	if user.IsAdmin(c) {
 		message = "ADMIN:" + message
